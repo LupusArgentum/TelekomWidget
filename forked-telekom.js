@@ -100,7 +100,7 @@ async function createWidget(items) {
     // Add time (and date) of last data fetch
     const df = new DateFormatter()
     const wasFetchedToday = (lastFetchDate.getDate() == new Date().getDate())
-    df.dateFormat = (wasFetchedToday ? "hh:mm" : "dd.MM. hh:mm")
+    df.dateFormat = (wasFetchedToday ? "hh:mm" : "dd.MM. HH:mm")
     
     let timeLabel = list.addText("aktualisiert " + df.string(lastFetchDate))
     timeLabel.font = Font.mediumSystemFont(9)
