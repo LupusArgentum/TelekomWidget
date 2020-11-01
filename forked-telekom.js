@@ -10,7 +10,8 @@ Script.complete()
 async function createWidget(items) {
   let fm = FileManager.local()
   let dir = fm.documentsDirectory()
-  let path = fm.joinPath(dir, "scriptable-telekom.json")
+  let jsonLocalPath = fm.joinPath(dir, "scriptable-telekom.json")
+  let lastFetchDateLocalPath = fm.joinPath(dir, "lastUpdate.txt")
 
   const list = new ListWidget()
   list.addSpacer()
@@ -21,17 +22,22 @@ async function createWidget(items) {
     r.headers = {
       "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1"
     }
-    let data = 0, api_online = false
+    let data = false, api_online = false, lastFetchDate = false
     try {
       // Fetch data from pass.telekom.de
       data = await r.loadJSON()
-      // Write JSON to iCloud file
-      fm.writeString(path, JSON.stringify(data, null, 2))
+      // Write JSON to local file
+      fm.writeString(jsonLocalPath, JSON.stringify(data, null, 2))
       api_online = true
+      lastFetchDate = new Date()
+      fm.writeString(lastFetchDateLocalPath, lastFetchDate.toString())
     } catch (err) {
-      // Read data from iCloud file
-      data = JSON.parse(fm.readString(path), null)
-      if (!data || !data.usedPercentage) {
+      console.log(err)
+      // Read data from local file
+      if (fm.fileExists(jsonLocalPath) && fm.fileExists(lastFetchDateLocalPath)) {
+        data = JSON.parse(fm.readString(jsonLocalPath), null)
+        lastFetchDate = new Date(fm.readString(lastFetchDateLocalPath, null))
+      } else {
         const errorList = new ListWidget()
         errorList.addText("Please disable WiFi for initial execution.")
         return errorList
@@ -52,6 +58,7 @@ async function createWidget(items) {
     // change color of the remaining volume according to usage
     const line2 = list.addText(100-data.usedPercentage + "%")
     line2.font = Font.boldSystemFont(36)
+    
     if (data.usedPercentage >= 90) line2.textColor = Color.red()
     else if (data.usedPercentage >= 75) line2.textColor = Color.orange()
     else if (data.usedPercentage >= 50) line2.textColor = Color.yellow()
@@ -90,17 +97,21 @@ async function createWidget(items) {
         line5.textColor = Color.orange()
     }
     
-  
+    // Add time (and date) of last data fetch
+    const df = new DateFormatter()
+    const wasUpdatedToday = (lastFetchDate.getDate() == new Date().getDate())
+    df.dateFormat = (wasUpdatedToday ? "hh:mm" : "dd.MM. hh:mm")
+    
+    let timeLabel = list.addText("aktualisiert " + df.string(lastFetchDate))
+    timeLabel.font = Font.mediumSystemFont(9)
+    timeLabel.textColor = Color.lightGray()
+    list.addSpacer()
+      
   } catch (err) {
+    console.log(err)
     list.addText("Error fetching JSON from https://pass.telekom.de/api/service/generic/v1/status")
   }
-
-  // Add time of last widget refresh:
-  const now = new Date().toString()
-  const timeLabel = list.addText("aktualisiert " + now.substring(16, 21))
-  timeLabel.font = Font.mediumSystemFont(10)
-  timeLabel.textColor = Color.lightGray()
-  list.addSpacer()
+ 
   return list
 }
 
