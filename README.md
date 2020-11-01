@@ -26,3 +26,7 @@ Hier kann es zu Problemen kommen, wenn das gebuchte Datenvolumen einen anderen P
 **Auf Wunsch kann jetzt in der oberen rechten Ecke ein Logo angezeigt werden. Ein Telekom-Logo habe ich vorkonfiguriert, wer ein anderes Logo möchte, muss die URL in Zeile 119 anpassen. Aktiviert wird das Logo, indem das Widget den Parameter _logo_ übergeben bekommt.**
 - 31.10.20: Logik-Fehler bei der Farbgebung des verbleibenden Volumens korrigiert
 - 01.11.20: **Anzeige der letzten Aktualisierung bezieht sich jetzt auf die Uhrzeit des letzten Abrufs von Datapass**
+
+
+**Für einen alternativen Fork mit einigen nützlichen Änderungen, hier entlang >>>**
+[https://gist.github.com/JoeGit42/bffae224a1398d2c35097fdefe2f4a0c](https://gist.github.com/JoeGit42/bffae224a1398d2c35097fdefe2f4a0c)
